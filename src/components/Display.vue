@@ -2,7 +2,7 @@
 defineProps({
   expression: String,
   result: String,
-})
+});
 </script>
 
 <template>

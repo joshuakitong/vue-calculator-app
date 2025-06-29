@@ -1,62 +1,62 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { evaluate } from 'mathjs'
-import Display from './Display.vue'
-import Keypad from './Keypad.vue'
+import { ref, onMounted } from 'vue';
+import { evaluate } from 'mathjs';
+import Display from './Display.vue';
+import Keypad from './Keypad.vue';
 
-defineProps({ title: String })
+defineProps({ title: String });
 
-const expression = ref('')
-const result = ref('')
-const justCalculated = ref(false)
+const expression = ref('');
+const result = ref('');
+const justCalculated = ref(false);
 
 const append = (val) => {
-  const isOperator = /[+\-*/]/.test(val)
-  const isNumber = /[0-9.]/.test(val)
+  const isOperator = /[+\-*/]/.test(val);
+  const isNumber = /[0-9.]/.test(val);
 
   if (justCalculated.value) {
     if (isOperator) {
-      expression.value = result.value.toString() + val
+      expression.value = result.value.toString() + val;
     } else if (isNumber) {
-      expression.value = val
+      expression.value = val;
       result.value = '';
     }
-    justCalculated.value = false
-    return
+    justCalculated.value = false;
+    return;
   }
 
-  const lastChar = expression.value.slice(-1)
+  const lastChar = expression.value.slice(-1);
 
-  if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return
+  if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return;
 
   if (val === ')') {
-    const open = (expression.value.match(/\(/g) || []).length
-    const close = (expression.value.match(/\)/g) || []).length
-    if (close >= open) return
+    const open = (expression.value.match(/\(/g) || []).length;
+    const close = (expression.value.match(/\)/g) || []).length;
+    if (close >= open) return;
   }
 
-  if (expression.value === '' && /[*/.)]/.test(val)) return
+  if (expression.value === '' && /[*/.)]/.test(val)) return;
 
-  expression.value += val
+  expression.value += val;
 }
 
 const clear = () => {
-  expression.value = ''
-  result.value = ''
+  expression.value = '';
+  result.value = '';
 }
 
 const deleteLast = () => {
-  expression.value = expression.value.slice(0, -1)
+  expression.value = expression.value.slice(0, -1);
 }
 
 const calculate = () => {
   try {
-    const evalResult = evaluate(expression.value)
-    result.value = evalResult.toString()
-    justCalculated.value = true
+    const evalResult = evaluate(expression.value);
+    result.value = evalResult.toString();
+    justCalculated.value = true;
   } catch (err) {
-    result.value = 'Error'
-    justCalculated.value = false
+    result.value = 'Error';
+    justCalculated.value = false;
   }
 }
 
@@ -64,22 +64,22 @@ const handleKey = (e) => {
   if (e.ctrlKey || e.metaKey) return
 
   if ('0123456789+-*/().'.includes(e.key)) {
-    e.preventDefault()
+    e.preventDefault();
     append(e.key)
   } else if (e.key === 'Enter' || e.key === '=') {
-    e.preventDefault()
-    calculate()
+    e.preventDefault();
+    calculate();
   } else if (e.key === 'Backspace') {
-    e.preventDefault()
-    deleteLast()
+    e.preventDefault();
+    deleteLast();
   } else if (e.key.toLowerCase() === 'c' || e.key === 'Escape') {
-    e.preventDefault()
-    clear()
+    e.preventDefault();
+    clear();
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKey)
+  window.addEventListener('keydown', handleKey);
 })
 </script>
 
