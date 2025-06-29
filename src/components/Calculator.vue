@@ -34,7 +34,20 @@ const append = (val) => {
 
   const lastChar = expression.value.slice(-1);
 
-  if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return;
+  if (val === '.') {
+    const lastOperatorIndex = Math.max(
+      expression.value.lastIndexOf('+'),
+      expression.value.lastIndexOf('-'),
+      expression.value.lastIndexOf('*'),
+      expression.value.lastIndexOf('/'),
+      expression.value.lastIndexOf('(')
+    );
+
+    const currentNumber = expression.value.slice(lastOperatorIndex + 1)
+    if (currentNumber.includes('.')) return;
+  }
+
+  if (/[+\-*/]/.test(val) && /[+\-*/.]/.test(lastChar)) return;
 
   if (val === ')') {
     const open = (expression.value.match(/\(/g) || []).length;
