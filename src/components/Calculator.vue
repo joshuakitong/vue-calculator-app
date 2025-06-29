@@ -14,6 +14,13 @@ const append = (val) => {
   const isOperator = /[+\-*/]/.test(val);
   const isNumber = /[0-9.]/.test(val);
 
+  if (result.value === 'Error' || result.value === 'NaN') {
+    expression.value = isNumber ? val : '';
+    result.value = '';
+    justCalculated.value = false;
+    return;
+  }
+
   if (justCalculated.value) {
     if (isOperator) {
       expression.value = result.value.toString() + val;
