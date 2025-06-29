@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { evaluate } from 'mathjs'
 import Display from './Display.vue'
 import Keypad from './Keypad.vue'
 
@@ -7,7 +8,6 @@ defineProps({ title: String })
 
 const expression = ref('')
 const result = ref('')
-
 const justCalculated = ref(false)
 
 const append = (val) => {
@@ -22,21 +22,22 @@ const append = (val) => {
       result.value = '';
     }
     justCalculated.value = false
-  } else {
-    const lastChar = expression.value.slice(-1)
-
-    if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return
-
-    if (val === ')') {
-      const open = (expression.value.match(/\(/g) || []).length
-      const close = (expression.value.match(/\)/g) || []).length
-      if (close >= open) return
-    }
-
-    if (expression.value === '' && /[*/.)]/.test(val)) return
-
-    expression.value += val
+    return
   }
+
+  const lastChar = expression.value.slice(-1)
+
+  if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return
+
+  if (val === ')') {
+    const open = (expression.value.match(/\(/g) || []).length
+    const close = (expression.value.match(/\)/g) || []).length
+    if (close >= open) return
+  }
+
+  if (expression.value === '' && /[*/.)]/.test(val)) return
+
+  expression.value += val
 }
 
 const clear = () => {
@@ -50,9 +51,10 @@ const deleteLast = () => {
 
 const calculate = () => {
   try {
-    result.value = eval(expression.value)
+    const evalResult = evaluate(expression.value)
+    result.value = evalResult.toString()
     justCalculated.value = true
-  } catch {
+  } catch (err) {
     result.value = 'Error'
     justCalculated.value = false
   }
