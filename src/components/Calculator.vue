@@ -11,7 +11,7 @@ const result = ref('');
 const justCalculated = ref(false);
 
 const append = (val) => {
-  const isOperator = /[+\-*/]/.test(val);
+  const isOperator = /[+\-*/^]/.test(val);
   const isNumber = /[0-9.]/.test(val);
 
   if (result.value === 'Error' || result.value === 'NaN') {
@@ -27,10 +27,18 @@ const append = (val) => {
     } else if (isNumber) {
       expression.value = val;
       result.value = '';
+    } else if (val === 'sqrt(') {
+      expression.value = `sqrt(${result.value})`;
     }
     justCalculated.value = false;
     return;
   }
+
+if (justCalculated.value && val === 'sqrt(') {
+  expression.value = `sqrt(${result.value})`;
+  justCalculated.value = false;
+  return;
+}
 
   const lastChar = expression.value.slice(-1);
 
@@ -52,7 +60,6 @@ const append = (val) => {
   const allowNegativeExponent = lastChar === '^' && val === '-'
 
   if (isCurrentOp && isLastOp && !allowNegativeExponent) {
-    // Allow only one dot in the current number
     if (val === '.') {
       const lastOperatorIndex = Math.max(
         expression.value.lastIndexOf('+'),
@@ -66,7 +73,6 @@ const append = (val) => {
       if (currentNumber.includes('.')) return
     }
 
-    // Replace last operator with the new one
     expression.value = expression.value.slice(0, -1) + val
     return
   }
@@ -109,7 +115,10 @@ const square = () => {
 
   if (!/[0-9)]/.test(lastChar)) return;
 
-  expression.value = `(${expression.value})^2`;
+  const valueToSquare = justCalculated.value ? result.value : expression.value;
+
+  expression.value = `(${valueToSquare})^2`;
+  justCalculated.value = false;
 }
 
 const negate = () => {
@@ -119,7 +128,11 @@ const negate = () => {
 
   if (!/[0-9)]/.test(lastChar)) return;
 
-  expression.value = `-(${expression.value})`;
+  const valueToNegate = justCalculated.value ? result.value : expression.value;
+  if (!valueToNegate) return;
+
+  expression.value = `-(${valueToNegate})`;
+  justCalculated.value = false;
 }
 
 const handleKey = (e) => {
