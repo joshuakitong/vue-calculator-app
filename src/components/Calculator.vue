@@ -124,7 +124,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-300 px-4">
+  <div class="min-h-screen flex items-center justify-center bg-gray-200 px-4">
     <div class="w-full max-w-md bg-gray-600 rounded-xl shadow-xl p-4">
       <h1 class="text-center text-2xl font-bold mb-4 text-white">{{ title }}</h1>
       <Display :expression="expression" :result="result" />
