@@ -47,7 +47,29 @@ const append = (val) => {
     if (currentNumber.includes('.')) return;
   }
 
-  if (/[+\-*/]/.test(val) && /[+\-*/.]/.test(lastChar)) return;
+  const isCurrentOp = /[+\-*/^.]/.test(val)
+  const isLastOp = /[+\-*/^.]/.test(lastChar)
+  const allowNegativeExponent = lastChar === '^' && val === '-'
+
+  if (isCurrentOp && isLastOp && !allowNegativeExponent) {
+    // Allow only one dot in the current number
+    if (val === '.') {
+      const lastOperatorIndex = Math.max(
+        expression.value.lastIndexOf('+'),
+        expression.value.lastIndexOf('-'),
+        expression.value.lastIndexOf('*'),
+        expression.value.lastIndexOf('/'),
+        expression.value.lastIndexOf('('),
+        expression.value.lastIndexOf('^')
+      )
+      const currentNumber = expression.value.slice(lastOperatorIndex + 1)
+      if (currentNumber.includes('.')) return
+    }
+
+    // Replace last operator with the new one
+    expression.value = expression.value.slice(0, -1) + val
+    return
+  }
 
   if (val === ')') {
     const open = (expression.value.match(/\(/g) || []).length;
