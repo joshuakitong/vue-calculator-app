@@ -67,10 +67,30 @@ const calculate = () => {
   }
 }
 
+const square = () => {
+  if (expression.value === '') return;
+
+  const lastChar = expression.value.slice(-1);
+
+  if (!/[0-9)]/.test(lastChar)) return;
+
+  expression.value = `(${expression.value})^2`;
+}
+
+const negate = () => {
+  if (expression.value === '') return;
+
+  const lastChar = expression.value.slice(-1);
+
+  if (!/[0-9)]/.test(lastChar)) return;
+
+  expression.value = `-(${expression.value})`;
+}
+
 const handleKey = (e) => {
   if (e.ctrlKey || e.metaKey) return
 
-  if ('0123456789+-*/().'.includes(e.key)) {
+  if ('0123456789+-*/().^'.includes(e.key)) {
     e.preventDefault();
     append(e.key)
   } else if (e.key === 'Enter' || e.key === '=') {
@@ -100,6 +120,8 @@ onMounted(() => {
         @clear="clear"
         @delete="deleteLast"
         @calculate="calculate"
+        @square="square"
+        @negate="negate"
       />
     </div>
   </div>
