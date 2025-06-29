@@ -112,7 +112,7 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-    <div class="w-full max-w-sm bg-white rounded-xl shadow-xl p-4">
+    <div class="w-full max-w-md bg-white rounded-xl shadow-xl p-4">
       <h1 class="text-center text-2xl font-bold mb-4">{{ title }}</h1>
       <Display :expression="expression" :result="result" />
       <Keypad
