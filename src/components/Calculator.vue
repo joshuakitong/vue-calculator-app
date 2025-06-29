@@ -8,8 +8,35 @@ defineProps({ title: String })
 const expression = ref('')
 const result = ref('')
 
+const justCalculated = ref(false)
+
 const append = (val) => {
-  expression.value += val
+  const isOperator = /[+\-*/]/.test(val)
+  const isNumber = /[0-9.]/.test(val)
+
+  if (justCalculated.value) {
+    if (isOperator) {
+      expression.value = result.value.toString() + val
+    } else if (isNumber) {
+      expression.value = val
+      result.value = '';
+    }
+    justCalculated.value = false
+  } else {
+    const lastChar = expression.value.slice(-1)
+
+    if (/[+\-*/.]/.test(val) && /[+\-*/.]/.test(lastChar)) return
+
+    if (val === ')') {
+      const open = (expression.value.match(/\(/g) || []).length
+      const close = (expression.value.match(/\)/g) || []).length
+      if (close >= open) return
+    }
+
+    if (expression.value === '' && /[*/.)]/.test(val)) return
+
+    expression.value += val
+  }
 }
 
 const clear = () => {
@@ -24,20 +51,27 @@ const deleteLast = () => {
 const calculate = () => {
   try {
     result.value = eval(expression.value)
+    justCalculated.value = true
   } catch {
     result.value = 'Error'
+    justCalculated.value = false
   }
 }
 
-// Keyboard input
 const handleKey = (e) => {
+  if (e.ctrlKey || e.metaKey) return
+
   if ('0123456789+-*/().'.includes(e.key)) {
+    e.preventDefault()
     append(e.key)
-  } else if (e.key === 'Enter') {
+  } else if (e.key === 'Enter' || e.key === '=') {
+    e.preventDefault()
     calculate()
   } else if (e.key === 'Backspace') {
+    e.preventDefault()
     deleteLast()
-  } else if (e.key.toLowerCase() === 'c') {
+  } else if (e.key.toLowerCase() === 'c' || e.key === 'Escape') {
+    e.preventDefault()
     clear()
   }
 }
