@@ -9,9 +9,10 @@ defineProps({ title: String });
 const expression = ref('');
 const result = ref('');
 const justCalculated = ref(false);
+const operators = /[+\-*/^.]/;
 
 const append = (val) => {
-  const isOperator = /[+\-*/^]/.test(val);
+  const isOperator = operators.test(val);
   const isNumber = /[0-9.]/.test(val);
 
   if (result.value === 'Error' || result.value === 'NaN') {
@@ -29,16 +30,18 @@ const append = (val) => {
       result.value = '';
     } else if (val === 'sqrt(') {
       expression.value = `sqrt(${result.value})`;
+    } else if (val === '(') {
+      expression.value = result.value.toString() + val;
     }
     justCalculated.value = false;
     return;
   }
 
-if (justCalculated.value && val === 'sqrt(') {
-  expression.value = `sqrt(${result.value})`;
-  justCalculated.value = false;
-  return;
-}
+  if (justCalculated.value && val === 'sqrt(') {
+    expression.value = `sqrt(${result.value})`;
+    justCalculated.value = false;
+    return;
+  }
 
   const lastChar = expression.value.slice(-1);
 
@@ -55,8 +58,8 @@ if (justCalculated.value && val === 'sqrt(') {
     if (currentNumber.includes('.')) return;
   }
 
-  const isCurrentOp = /[+\-*/^.]/.test(val)
-  const isLastOp = /[+\-*/^.]/.test(lastChar)
+  const isCurrentOp = operators.test(val)
+  const isLastOp = operators.test(lastChar)
   const allowNegativeExponent = lastChar === '^' && val === '-'
 
   if (isCurrentOp && isLastOp && !allowNegativeExponent) {
@@ -91,6 +94,7 @@ if (justCalculated.value && val === 'sqrt(') {
 const clear = () => {
   expression.value = '';
   result.value = '';
+  justCalculated.value = false;
 }
 
 const deleteLast = () => {
@@ -99,14 +103,19 @@ const deleteLast = () => {
 
 const calculate = () => {
   try {
-    const evalResult = evaluate(expression.value);
+    const open = (expression.value.match(/\(/g) || []).length;
+    const close = (expression.value.match(/\)/g) || []).length;
+    let balancedExpression = expression.value + ')'.repeat(open - close);
+
+    let evalResult = evaluate(balancedExpression);
+
     result.value = evalResult.toString();
     justCalculated.value = true;
   } catch (err) {
     result.value = 'Error';
     justCalculated.value = false;
   }
-}
+};
 
 const square = () => {
   if (expression.value === '') return;
@@ -117,7 +126,7 @@ const square = () => {
 
   const valueToSquare = justCalculated.value ? result.value : expression.value;
 
-  expression.value = `(${valueToSquare})^2`;
+  expression.value = `((${valueToSquare})^2)`;
   justCalculated.value = false;
 }
 
@@ -162,7 +171,7 @@ onMounted(() => {
   <div class="min-h-screen flex items-center justify-center bg-gray-200 px-4">
     <div class="w-full max-w-md bg-gray-600 rounded-xl shadow-xl p-4">
       <h1 class="text-center text-2xl font-bold mb-4 text-white">{{ title }}</h1>
-      <Display :expression="expression" :result="result" />
+      <Display :expression="expression" :result="result" :justCalculated="justCalculated" />
       <Keypad
         @append="append"
         @clear="clear"

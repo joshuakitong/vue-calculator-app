@@ -36,7 +36,7 @@ const keys = [
     { label: '±', class: 'bg-gray-100 hover:bg-gray-200', action: () => emit('negate') },
     { label: '0', class: 'bg-gray-100 hover:bg-gray-200', action: () => emit('append', '0') },
     { label: '.', class: 'bg-gray-100 hover:bg-gray-200', action: () => emit('append', '.') },
-    { label: '=', class: 'bg-gray-400 hover:bg-gray-500', action: () => emit('calculate') },
+    { label: '=', class: 'bg-blue-400 hover:bg-blue-500', action: () => emit('calculate') },
   ],
 ];
 
